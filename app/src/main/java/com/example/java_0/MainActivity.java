@@ -20,23 +20,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView textView = findViewById(R.id.result);
-        String display = "Start scanning";
-        textView.setText(display);
-        Switch switchButton = findViewById(R.id.switch1);
+        final TextView textView = findViewById(R.id.result);
         final String TAG = "MainApp";
+
+        Switch switchButton = findViewById(R.id.switch1);
         switchButton.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-            //@Override
+            @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 // Perform actions based on switch state (isChecked)
                 if (isChecked) {
                     textView.setText("Starting IMU Scan...");
                     SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
                     Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                    //Sensor gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
                     if (accelerometer != null) {
-                        SensorEventListener accelerometerListener = new SensorEventListener() {
+                        final SensorEventListener accelerometerListener = new SensorEventListener() {
                             @Override
                             public void onSensorChanged(SensorEvent event) {
                                 // Handle accelerometer measurements
@@ -47,11 +45,15 @@ public class MainActivity extends AppCompatActivity {
                                 textView.setText(displayText);
                                 Log.i(TAG, "IMU:" + displayText);
                             }
+
                             @Override
                             public void onAccuracyChanged(Sensor sensor, int accuracy) {
                                 // Handle changes in sensor accuracy
                             }
                         };
+
+                        // Register the listener with the SensorManager
+                        sensorManager.registerListener(accelerometerListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
                     } else {
                         textView.setText("No IMU available / Unsupported format");
                     }
@@ -62,6 +64,5 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 }
