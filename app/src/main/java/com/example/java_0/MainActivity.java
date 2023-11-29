@@ -10,8 +10,11 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,22 +22,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        final ImageView arrow = findViewById(R.id.upArrow);
         final TextView textView = findViewById(R.id.result);
         final String TAG = "MainApp";
 
         Switch switchButton = findViewById(R.id.switch1);
         switchButton.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+            private SensorManager sensorManager;
+            private SensorEventListener accelerometerListener;
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                // Perform actions based on switch state (isChecked)
                 if (isChecked) {
                     textView.setText("Starting IMU Scan...");
-                    SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+                    sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
                     Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
                     if (accelerometer != null) {
-                        final SensorEventListener accelerometerListener = new SensorEventListener() {
+                        accelerometerListener = new SensorEventListener() {
                             @Override
                             public void onSensorChanged(SensorEvent event) {
                                 // Handle accelerometer measurements
@@ -43,6 +47,33 @@ public class MainActivity extends AppCompatActivity {
                                 float z = event.values[2];
                                 String displayText = String.format("X: %.2f Y: %.2f Z: %.2f", x, y, z);
                                 textView.setText(displayText);
+                                float absX = Math.abs(x);
+                                float absY = Math.abs(y);
+                                float absZ = Math.abs(z);
+                                if (absX > absY && absX > absZ){
+                                    if (x > 0) {
+                                        arrow.setRotation(0);
+                                    }
+                                    else{
+                                        arrow.setRotation((180));
+                                    }
+                                }
+                                else if (absY > absX && absY > absZ){
+                                    if (y > 0){
+                                        arrow.setRotation(-90);
+                                    }
+                                    else{
+                                        arrow.setRotation(90);
+                                    }
+                                }
+                                else if (absZ > absX & absZ > absY){
+                                    if (z > 0) {
+                                        arrow.setRotation(-90);
+                                    }
+                                    else {
+                                        arrow.setRotation(90);
+                                    }
+                                }
                                 Log.i(TAG, "IMU:" + displayText);
                             }
 
@@ -60,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     textView.setText("Switch is OFF");
-                    // Perform additional actions for OFF state
+                    sensorManager.unregisterListener(accelerometerListener);
                 }
             }
         });
