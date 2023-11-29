@@ -8,7 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -24,13 +24,13 @@ public class MainActivity extends AppCompatActivity {
         String display = "Start scanning";
         textView.setText(display);
         Switch switchButton = findViewById(R.id.switch1);
-
+        final String TAG = "MainApp";
         switchButton.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
             //@Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 // Perform actions based on switch state (isChecked)
                 if (isChecked) {
-                    textView.setText("Starting IMU Scan");
+                    textView.setText("Starting IMU Scan...");
                     SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
                     Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
                     //Sensor gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                                 float z = event.values[2];
                                 String displayText = String.format("X: %.2f Y: %.2f Z: %.2f", x, y, z);
                                 textView.setText(displayText);
+                                Log.i(TAG, "IMU:" + displayText);
                             }
                             @Override
                             public void onAccuracyChanged(Sensor sensor, int accuracy) {
